@@ -8,10 +8,17 @@
 <table>
   <% @streams.each do |stream| %>
   <tr>
-    <td><a href='' onclick='new FlussonicPlayer({parentId: "#video", flussonic: {url: "http://localhost:8080/<%= stream.name%>/index.m3u8"}}); return false;'><%= stream.name %></a></td>
+    <td>
+      <a href='' onclick='new FlussonicPlayer({parentId: "#video", flussonic: {url: "http://localhost:8080/<%= stream.name%>/index.m3u8"}}); return false;'><%= stream.name %></a>
+    </td>
     <td><%= stream.bitrate %>k</td>
     <td><%= stream.lifetime/1000 %>s</td>
     <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
+    <td>
+      <% stream.recordings.order(start_at: :asc).each do |r| %>
+        <span><%= r.start.strftime("%Y-%m-%d %H:%M") %> — <%= distance_of_time_in_words(r.start, r.finish) %>s</span>
+      <% end %>
+    </td>
   <% end %>
 </table>
 
