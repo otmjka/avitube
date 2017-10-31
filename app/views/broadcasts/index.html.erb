@@ -5,7 +5,10 @@
 <% end %>
 
 
-<table>
+<%- 
+total_width = 4.hour
+total_start = total_width.ago %>
+<table class="table">
   <% @streams.each do |stream| %>
   <tr>
     <td>
@@ -14,10 +17,20 @@
     <td><%= stream.bitrate %>k</td>
     <td><%= stream.lifetime/1000 %>s</td>
     <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
-    <td>
-      <% stream.recordings.order(start_at: :asc).each do |r| %>
-        <span><%= r.start.strftime("%Y-%m-%d %H:%M") %> — <%= distance_of_time_in_words(r.start, r.finish) %>s</span>
-      <% end %>
+    <td style="width: 80%">
+
+      <div class="progress" style="width: 100%">
+        <%- last_end = total_start %>
+        <% stream.recordings.order(start_at: :asc).each do |r| %>
+          <%- offset2 = r.start < total_start ? 0 : ((r.start - total_start)*100/total_width).round(2)  %> 
+          <%- offset = r.start < last_end ? 0 : ((r.start - last_end)*100/total_width).round(2)  %> 
+          <%- width = ((r.finish - (r.start < last_end ? last_end : r.start))*100/total_width).round(2) %>
+          <%- last_end = r.finish < last_end ? last_end : r.finish %>
+          <% if width > 0 %>
+            <div class="progress-bar" style="margin-left: <%= offset %>%; width: <%= width %>%;"></div>
+          <% end %>
+        <% end %>
+      </div>
     </td>
   <% end %>
 </table>
