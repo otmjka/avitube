@@ -8,7 +8,7 @@
 <table>
   <% @streams.each do |stream| %>
   <tr>
-    <td><a href='' onclick='new FlussonicPlayer({parentId: "#video", flussonic: {url: "http://localhost:8080/<%= stream.name%>/index.m3u8"}}); return false;'><%= stream.name %></a></td>
+    <td><a href='' onclick='onClick("<%= stream.name%>");return false;'><%= stream.name %></a></td>
     <td><%= stream.bitrate %>k</td>
     <td><%= stream.lifetime/1000 %>s</td>
     <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
@@ -16,3 +16,13 @@
 </table>
 
 <div id="video" style="width:640px;height:480px"></div>
+
+<script>
+  function onClick(streamName) {
+    // index.m3u8/
+    var url = "http://localhost:8080/" + streamName;
+    var params = FlussonicPlayer.parseUrl(url, {parentId: "#video"});
+
+    new FlussonicPlayer(params);
+  }
+</script>
