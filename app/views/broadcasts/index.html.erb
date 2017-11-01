@@ -1,6 +1,7 @@
 <h1>Broadcasts</h1>
 
 <%= form_tag "/broadcasts", method: :post do %>
+<input type="text" name="stream[comment]" placeholder="Comment" /><br>
 <button type="submit">Create new broadcast</button>
 <% end %>
 
@@ -11,15 +12,14 @@ total_start = total_width.ago %>
 <table class="table">
   <% @streams.each do |stream| %>
   <tr>
-    <td><a href='' onclick='onClick("<%= stream.name%>");return false;'><%= stream.name %></a></td>
+    <td style="white-space: nowrap;"><a href='' onclick='onClick("<%= stream.name%>");return false;'><%= stream.comment.blank? ? stream.name : stream.comment %></a></td>
     <td><%= stream.bitrate %>k</td>
-    <td><%= stream.lifetime/1000 %>s</td>
-    <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
-    <td style="width: 80%">
+    <td><%= Time.at(stream.lifetime/1000).utc.strftime("%H:%M:%S") %></td>
+    <td style="width: 70%">
 
       <div class="progress" style="width: 100%">
         <%- last_end = total_start %>
-        <% stream.recordings.order(start_at: :asc).each do |r| %>
+        <% stream.recordings.each do |r| %>
           <%- offset2 = r.start < total_start ? 0 : ((r.start - total_start)*100/total_width).round(2)  %> 
           <%- offset = r.start < last_end ? 0 : ((r.start - last_end)*100/total_width).round(2)  %> 
           <%- width = ((r.finish - (r.start < last_end ? last_end : r.start))*100/total_width).round(2) %>
@@ -30,6 +30,7 @@ total_start = total_width.ago %>
         <% end %>
       </div>
     </td>
+    <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
   <% end %>
 </table>
 

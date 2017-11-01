@@ -1,10 +1,12 @@
 class BroadcastsController < ApplicationController
   def index
-    @streams = Stream.where(provider: "avitube").order("name desc").all
+    @streams = Stream.where(provider: "avitube").order("name desc").includes(:recordings).all
   end
 
   def create
-    Stream.create(name: "a#{Time.now.to_i}", provider: "avitube", publish_enabled: true, dvr: "movies 20G", urls: "fake://fake")
+    stream_params = params[:stream].permit(:comment).merge(name: "a#{Time.now.to_i}", 
+      provider: "avitube", publish_enabled: true, dvr: "movies 20G", urls: "fake://fake")
+    Stream.create(stream_params)
     redirect_to "/"
   end
 
