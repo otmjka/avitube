@@ -1,0 +1,69 @@
+<h1><%= @stream.title %></h1>
+
+
+<% hostname = request.env["SERVER_NAME"] %>
+
+<div class="row">
+  <div class="col-lg-9">
+    
+<%- if @stream.bitrate.to_i > 0 %>
+    <div class="row">
+      <div class="col-lg-12">
+<div id="video" data-url="<%=  "http://#{hostname}:8080/#{@stream.name}?ago=3600"%>" style="width:100%;height:480px"></div>
+
+<script>
+window.addEventListener("load", function() {
+  var url = document.getElementById("video").getAttribute("data-url");
+  var params = FlussonicPlayer.parseUrl(url, {parentId: "#video"});
+
+  new FlussonicPlayer(params);
+});
+</script>
+
+      </div>
+    </div>
+<%- end %>        
+
+
+<% if @stream.urls.blank? %>
+    <div class="row">
+      <div class="col-sm-4">
+        <button type="button" class="btn btn-danger" onclick="startPublish()">Publish</button>
+      </div>
+      <div class="col-sm-4">
+        <span>Publish url: <code>rtmp://<%= hostname %>:1935/static/<%= @stream.name %></code></span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-10">
+        <video id="publisher"></video>
+      </div>
+    </div>
+<% end %>
+
+
+  </div>
+
+
+  <div class="col-lg-3">
+    <%- @streams.each do |stream| %>
+    <div class="row">
+      <div class="col-lg-12">
+        <video style="width:100%" src="//<%= hostname %>:8080/<%= stream.name %>/preview.mp4" ></video>
+        <span><%= link_to stream.title, broadcast_path(stream.name) %></span>
+      </div>
+    </div>
+    <%- end %>
+  </div> 
+</div>
+
+
+<script type="text/javascript">
+
+function startPublish() {
+  initWebRTCVideo("<%= @stream.name %>", document.getElementById("publisher"), function() {
+    stopWebRTCVideo();
+  }, "http://<%= hostname %>:8080")
+}
+
+</script>

@@ -1,8 +1,23 @@
-<h1>Broadcasts</h1>
+<h1>Active broadcasts</h1>
 
-<%= form_tag "/broadcasts", method: :post do %>
-<input type="text" name="stream[comment]" placeholder="Comment" /><br>
-<button type="submit">Create new broadcast</button>
+<%- if logged? %>
+<div class="row">
+  <div class="col-md-4 col-sm-6">
+    <%= form_tag "/broadcasts", method: :post do %>
+      <div class="input-group">
+        <input type="text" class="form-control" name="stream[comment]" placeholder="Comment" />        
+      </div>
+      <div class="input-group">
+        <span class="input-group-btn">
+          <button type="submit" name="kind" value="sample" class="btn btn-primary">Sample broadcast</button>
+        </span>
+        <span class="input-group-btn">
+          <button type="submit" name="kind" value="published" class="btn btn-success">Published broadcast</button>
+        </span>
+      </div>
+    <% end %>
+  </div>
+</div>
 <% end %>
 
 
@@ -12,7 +27,7 @@ total_start = total_width.ago %>
 <table class="table">
   <% @streams.each do |stream| %>
   <tr>
-    <td style="white-space: nowrap;"><a href='' onclick='onClick("<%= stream.name%>");return false;'><%= stream.comment.blank? ? stream.name : stream.comment %></a></td>
+    <td style="white-space: nowrap;"><%= link_to(stream.title, broadcast_path(stream.name))%></a></td>
     <td><%= stream.bitrate %>k</td>
     <td><%= stream.lifetime ? Time.at(stream.lifetime/1000).utc.strftime("%H:%M:%S") : "offline" %></td>
     <td style="width: 70%" class="container">
@@ -32,6 +47,7 @@ total_start = total_width.ago %>
           </div>
         </div>
       </div>
+      <%- if false %>
       <div class="row">
         <div class="col-sm-12">
           <div class="progress" style="width: 100%">
@@ -48,19 +64,9 @@ total_start = total_width.ago %>
           </div>
         </div>
       </div>
+      <% end %>
     </td>
     <td><%= button_to "delete", "/broadcasts/#{stream.name}", method: :delete %></td>
   <% end %>
 </table>
 
-<div id="video" style="width:640px;height:480px"></div>
-
-<script>
-  function onClick(streamName) {
-    // index.m3u8/
-    var url = "http://localhost:8080/" + streamName+"?ago=3600";
-    var params = FlussonicPlayer.parseUrl(url, {parentId: "#video"});
-
-    new FlussonicPlayer(params);
-  }
-</script>
