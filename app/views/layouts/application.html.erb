@@ -22,6 +22,22 @@
 
   <body>
     <div class="container">
+      <% - if Slack.client_id %>
+        <div class="row">
+          <% -if session[:user_name] %>
+            <div class="col-sm-4">
+              <span>Hi, <%= session[:user_name] %></span>
+              <%= button_to "Logout", "/slack/logout", method: "post" %>
+            </div>
+          <% else %>
+            <div class="col-sm-4">
+              <%= link_to("https://slack.com/oauth/authorize?#{{scope: "identity.basic", client_id: Slack.client_id, redirect_uri: "http://localhost:3000/slack/auth"}.to_query}") do %>
+                <img src="https://api.slack.com/img/sign_in_with_slack.png" />
+              <%- end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
       <%= yield %>
     </div>
   </body>
